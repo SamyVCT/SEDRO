@@ -1,5 +1,5 @@
 Utilisation de Github : 
- - pour les fichiers de plus de 100MB, utiliser git large file storage ou juste ajouter dans .gitignore
+ - pour les fichiers de plus de 100MB (weights), utiliser git large file storage ou juste ajouter dans .gitignore
 
 Programmes développés l'année dernière :
 

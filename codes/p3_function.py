@@ -53,5 +53,8 @@ def p3(img):
     cv2.imshow("u",u_mapped)
     cv2.imshow("v",v_mapped)
     #cv2.imshow("mask_v",mask_v)
+    cv2.waitKey(0)
+
+p3(cv2.imread("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/codes/yolos/images/image_tennis.jpg"))
 
             

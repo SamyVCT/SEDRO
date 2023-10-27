@@ -26,10 +26,10 @@ def p2(img):
     # les variables low2 et high2 sont utilisées pour le détection de couleur rouge
     # car dans l'espace HSV le rouge se situe au début du cercle (0-10) et à la fin (245-255)
     # mask2 et bitwise_or sont aussi utilisées pour le rouge
-    low = np.array([100,120,70])
-    high = np.array([130,255,255])
-    # low2 = np.array([245, 50, 150])
-    # high2 = np.array([255, 255, 255])
+    # low = np.array([100,120,70])
+    # high = np.array([130,255,255])
+    low = np.array([245, 50, 150])
+    high = np.array([255, 255, 255])
     color_infos = (0,255,255)
 
     #convertir la couleur B,G,R en H,S,V
@@ -62,5 +62,7 @@ def p2(img):
     #cv2.imshow('Image2', img2)
     #cv2.imshow('Mask', mask)
     cv2.imshow('image',img_hsv)
+    cv2.waitKey(0)
     
-        
+
+p2(cv2.imread("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/codes/yolos/images/image_tennis.jpg"))

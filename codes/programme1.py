@@ -11,7 +11,7 @@ import pandas as pd
 import cv2
 
 #lecture de l'image qui se trouve dans le même dossier que le programme
-img = cv2.imread("logo.jpg")
+img = cv2.imread("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/codes/yolos/images/image_tennis.jpg")
 (hauteur, largeur, epaisseur) = img.shape
 
 #import du document csv contenant 865 couleurs R,G,B

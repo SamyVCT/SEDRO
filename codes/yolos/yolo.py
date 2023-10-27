@@ -78,4 +78,4 @@ def yolo_function(img):
     cv.waitKey(0)
     #cv.destroyAllWindows()
 
-yolo_function(cv.imread("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/codes/yolos/images/image_tennis.jpg"))
+yolo_function(cv.imread("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/codes/yolos/images/image1.jpg"))
