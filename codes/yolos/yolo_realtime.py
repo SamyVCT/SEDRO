@@ -21,7 +21,8 @@ cap.set(3, 640)
 cap.set(4, 480)
 
 # model
-model = YOLO("yolo-Weights/yolov8n.pt")
+model = YOLO("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/yolo-Weights/yolov8n.pt")
+#model = YOLO("yolo-Weights/yolov8n.pt") : ultralytics downloads the latest model of yolov8 (ONLY WORKS IF YOU'RE ONLINE)
 
 # object classes
 classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat",
