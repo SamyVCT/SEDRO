@@ -10,6 +10,8 @@ trouve le plus grand contour de l'image seuillée et dessine un rectangle autour
 l'image d'entrée. Le résultat final est affiché dans une fenêtre de sortie en temps réel.
 """
 
+#test
+
 import cv2
 import numpy as np
 
