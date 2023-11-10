@@ -1,7 +1,7 @@
 Utilisation de Github : 
- - pour les fichiers de plus de 100MB (weights), utiliser git large file storage ou juste ajouter dans .gitignore
+ - pour les fichiers de plus de 100MB (weights), ajouter dans .gitignore et télécharger le fichier sur le drive
 
-Programmes développés l'année dernière :
+Programmes développés 2021/2022 :
 
     programme1.py
     programme2.py
