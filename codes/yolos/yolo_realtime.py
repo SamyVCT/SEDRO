@@ -17,11 +17,16 @@ from ultralytics import YOLO
 import math 
 # start webcam
 cap = cv.VideoCapture(0)
-cap.set(3, 640)
-cap.set(4, 480)
+cap.set(3, 1920)
+cap.set(4, 1080)
 
 # model
-model = YOLO("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/yolo-Weights/yolov8n.pt")
+model = YOLO("yolo-Weights/yolov8n.pt")
+# model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
+# pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
+# pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 
+# Si ça marche pas peut être il faut installer CUDA 12.1 : https://developer.nvidia.com/cuda-toolkit
+
 #model = YOLO("yolo-Weights/yolov8n.pt") : ultralytics downloads the latest model of yolov8 (ONLY WORKS IF YOU'RE ONLINE)
 
 # object classes
@@ -40,7 +45,7 @@ classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "trai
 
 while True:
     success, img = cap.read()
-    results = model(img, stream=True)
+    results = model(img, stream=True, imgsz=1920)
 
     # coordinates
     for r in results:
