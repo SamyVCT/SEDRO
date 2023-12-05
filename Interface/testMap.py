@@ -2,8 +2,12 @@ from PIL import Image, ImageDraw, ImageTk
 import math
 import tkinter as tk
 from threading import Thread
+from threading import Lock
 import time
 import imageio
+import sys
+
+import yolo_realtime
 
 def polygonDirection(angle1, angle2, width, height):
     center = (width/2, height/2)
@@ -42,7 +46,7 @@ def polygonDirection(angle1, angle2, width, height):
     return [(width/2, height/2), point1, point2]
 
 def drawMap(color, angles, points, areas,panel):
-    im = Image.open("Images/basedrone2.png").resize((700, 350)).convert('RGBA')
+    im = Image.open("Images/basedrone2.png").resize(map_size).convert('RGBA')
     width, height = im.width, im.height
     drone = Image.open("Images/drone.png").resize((50,25)).convert('RGBA')
     d = ImageDraw.Draw(im)
@@ -100,10 +104,14 @@ def obter_dimensoes_tela():
     altura = root.winfo_screenheight()
     return largura, altura
 
+global lock
+lock = Lock()
+
 def obter_quadro(video, index):
     try:
         quadro = video.get_data(index)
-        quadro_redimensionado = Image.fromarray(quadro).resize((700, 350))
+        
+        quadro_redimensionado = Image.fromarray(yolo_realtime.out).resize(video_size)
         return ImageTk.PhotoImage(quadro_redimensionado)
   
     except Exception as e:
@@ -129,32 +137,74 @@ def click1(event):
     x, y = event.x, event.y
     print(f"Clique 1: Clique detectado em ({x}, {y})")
 
+    global map_size
+    map_size = obter_dimensoes_tela()
+
+    panel2.place_forget()
+    panel3.place_forget()
+    panel.place(x = 0, y = 0)
+
 def click2(event):
     # Obtém as coordenadas do clique
     x, y = event.x, event.y
     print(f"Click 2: Clique detectado em ({x}, {y})")
+
+    global video_size
+    video_size = obter_dimensoes_tela()
+
+    panel.place_forget()
+    panel3.place_forget()
+    panel2.place(x = 0, y = 0)
 
 def click3(event):
     # Obtém as coordenadas do clique
     x, y = event.x, event.y
     print(f"Click 3: Clique detectado em ({x}, {y})")
 
+    global third_size
+    third_size = obter_dimensoes_tela()
+
+    panel.place_forget()
+    panel2.place_forget()
+
+    img = Image.open("Images/videodrone.png").resize(third_size).convert('RGBA')
+    img_tk = ImageTk.PhotoImage(img)
+    panel3 = tk.Label(root, image = img_tk)
+    panel3.place(x = 0, y = 0)
+
+def return_images():
+    global map_size
+    global video_size
+    map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
+    panel2.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=root.winfo_screenwidth() - 750*largura_tela/1536)
+    panel3.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=40*largura_tela/864)
+
+
 # Crie a janela principal
 root = tk.Tk()
 root.title("SEDRO")
+root.state("zoomed")
 largura_tela, altura_tela = obter_dimensoes_tela()
+
+map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+
 
 root.geometry(f"{largura_tela}x{altura_tela}")
 root.configure(bg="#303030")
 
 panel = tk.Label(root)
 
-img = Image.open("Images/videodrone.png").resize((700, 350)).convert('RGBA')
+img = Image.open("Images/videodrone.png").resize(video_size).convert('RGBA')
 img_tk = ImageTk.PhotoImage(img)
 panel2 = tk.Label(root, image = img_tk)
 
 
-img = Image.open("Images/videodrone.png").resize((700, 350)).convert('RGBA')
+img = Image.open("Images/videodrone.png").resize(third_size).convert('RGBA')
 img_tk = ImageTk.PhotoImage(img)
 panel3 = tk.Label(root, image = img_tk)
 
@@ -162,19 +212,31 @@ panel.bind("<Button-1>", click1)  # <Button-1> representa o clique do botão esq
 panel2.bind("<Button-1>", click2)  # <Button-1> representa o clique do botão esquerdo do mouse
 panel3.bind("<Button-1>", click3)  # <Button-1> representa o clique do botão esquerdo do mouse
 
-panel.place(x=root.winfo_screenwidth() - 750, y=20)
-panel2.place(y=root.winfo_screenheight() - 460, x=root.winfo_screenwidth() - 750)
-panel3.place(y=root.winfo_screenheight() - 460, x=40)
+panel.bind("<Enter>", lambda e: panel.config(cursor="hand2"))  # "hand2" indica um cursor de mão
+panel.bind("<Leave>", lambda e: panel.config(cursor=""))
+
+panel2.bind("<Enter>", lambda e: panel2.config(cursor="hand2"))  # "hand2" indica um cursor de mão
+panel2.bind("<Leave>", lambda e: panel2.config(cursor=""))
+
+root.bind("<Escape>", lambda e: return_images())
+
+panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
+panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_screenwidth() - 750*largura_tela/1536)
+panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
 
 
 # Inicie a thread
 thread = Thread(target=MapLoop, args=(panel, img))
 thread2 = Thread(target=videoPlayer, args=(panel2,))
+thread3 = Thread(target=yolo_realtime.yolo_realtime_boot, args=(lock,))
 thread.daemon = True 
 thread2.daemon = True 
+thread3.daemon = True 
 
 thread.start()
 thread2.start()
+thread3.start()
+
 
 # Inicie o loop principal da interface gráfica
 root.mainloop()
