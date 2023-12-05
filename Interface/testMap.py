@@ -2,9 +2,12 @@ from PIL import Image, ImageDraw, ImageTk
 import math
 import tkinter as tk
 from threading import Thread
+from threading import Lock
 import time
 import imageio
+import sys
 
+import yolo_realtime
 
 def polygonDirection(angle1, angle2, width, height):
     center = (width/2, height/2)
@@ -101,10 +104,14 @@ def obter_dimensoes_tela():
     altura = root.winfo_screenheight()
     return largura, altura
 
+global lock
+lock = Lock()
+
 def obter_quadro(video, index):
     try:
         quadro = video.get_data(index)
-        quadro_redimensionado = Image.fromarray(quadro).resize(video_size)
+        
+        quadro_redimensionado = Image.fromarray(yolo_realtime.out).resize(video_size)
         return ImageTk.PhotoImage(quadro_redimensionado)
   
     except Exception as e:
@@ -221,11 +228,15 @@ panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tel
 # Inicie a thread
 thread = Thread(target=MapLoop, args=(panel, img))
 thread2 = Thread(target=videoPlayer, args=(panel2,))
+thread3 = Thread(target=yolo_realtime.yolo_realtime_boot, args=(lock,))
 thread.daemon = True 
 thread2.daemon = True 
+thread3.daemon = True 
 
 thread.start()
 thread2.start()
+thread3.start()
+
 
 # Inicie o loop principal da interface gráfica
 root.mainloop()
