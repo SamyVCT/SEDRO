@@ -16,12 +16,13 @@ avec les boîtes englobantes et les étiquettes.
 from ultralytics import YOLO
 import math 
 # start webcam
-cap = cv.VideoCapture(0)
-cap.set(3, 640)
-cap.set(4, 480)
+cap = cv.VideoCapture(1)
+cap.set(3, 1920)
+cap.set(4, 1080)
 
 # model
 model = YOLO("C:/Users/samyv/OneDrive/Documents/ensta cours/2a/pie/SEDRO/yolo-Weights/yolov8n.pt")
+model.to('cuda')
 #model = YOLO("yolo-Weights/yolov8n.pt") : ultralytics downloads the latest model of yolov8 (ONLY WORKS IF YOU'RE ONLINE)
 
 # object classes
@@ -40,7 +41,7 @@ classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "trai
 
 while True:
     success, img = cap.read()
-    results = model(img, stream=True)
+    results = model(img, stream=True, imgsz=1920)
 
     # coordinates
     for r in results:
