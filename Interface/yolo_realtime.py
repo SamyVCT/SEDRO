@@ -16,6 +16,8 @@ avec les boîtes englobantes et les étiquettes.
 from ultralytics import YOLO
 import math 
 
+
+
 # start webcam
 def yolo_realtime_boot(lock):
     cap = cv.VideoCapture(0)
@@ -46,10 +48,8 @@ def yolo_realtime_boot(lock):
 
 
     while True:
-        lock.acquire()
         success, img = cap.read()
-        results = model(img, stream=True, imgsz=1280)
-
+        results = model(img, stream=True, imgsz=640)
         # coordinates
         for r in results:
             boxes = r.boxes
@@ -80,7 +80,6 @@ def yolo_realtime_boot(lock):
                 cv.putText(img, classNames[cls] + " confiance : " + str(confidence), org, font, fontScale, color, thickness)
         global out
         out = img
-        lock.release()
 
     cap.release()
     cv.destroyAllWindows()

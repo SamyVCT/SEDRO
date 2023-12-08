@@ -9,8 +9,9 @@ while 1:
 	into_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) 
 	# changing the color format from BGr to HSV 
 	# This will be used to create the mask 
-	L_limit=np.array([0,50,50]) # [98,50,50] setting the blue lower limit / [0,50,50] red / 
-	U_limit=np.array([40,255,255]) # [139,255,255] setting the blue upper limit / [40,255,255] red / 
+	L_limit=np.array([(360-230)*255/360-20,50, 50]) # [98,50,50] setting the blue lower limit / [0,50,50] red / 
+	U_limit=np.array([(360-228)*255/360+20,255,255]) # [139,255,255] setting the blue upper limit / [40,255,255] red / 
+	
 		
 
 	b_mask=cv2.inRange(into_hsv,L_limit,U_limit) 

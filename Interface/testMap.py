@@ -183,6 +183,13 @@ def return_images():
     panel3.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=40*largura_tela/864)
 
 
+def colorChoice(color): #3-array HSV
+    mask_low = [0,40,40]
+    mask_high = [0,255,255]
+
+    mask_low[0] = (360-color[0])*255/360 - 20
+    mask_high[0] = (360-color[0])*255/360 + 20
+
 # Crie a janela principal
 root = tk.Tk()
 root.title("SEDRO")
@@ -236,6 +243,7 @@ thread3.daemon = True
 thread.start()
 thread2.start()
 thread3.start()
+
 
 
 # Inicie o loop principal da interface gráfica
