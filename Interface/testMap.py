@@ -1,13 +1,18 @@
 from PIL import Image, ImageDraw, ImageTk
 import math
 import tkinter as tk
+from tkinter import colorchooser
 from threading import Thread
 from threading import Lock
 import time
 import imageio
 import sys
+import colorsys
 
 import yolo_realtime
+import extract_monochromatic_colour
+import cv2
+from math import floor
 
 def polygonDirection(angle1, angle2, width, height):
     center = (width/2, height/2)
@@ -107,11 +112,9 @@ def obter_dimensoes_tela():
 global lock
 lock = Lock()
 
-def obter_quadro(video, index):
+def obter_quadro(video):
     try:
-        quadro = video.get_data(index)
-        
-        quadro_redimensionado = Image.fromarray(yolo_realtime.out).resize(video_size)
+        quadro_redimensionado = Image.fromarray(video).resize(video_size)
         return ImageTk.PhotoImage(quadro_redimensionado)
   
     except Exception as e:
@@ -119,18 +122,25 @@ def obter_quadro(video, index):
         return None
 
 def videoPlayer(panel):
-    
-    video = imageio.get_reader('Images/video.mp4')
-    index = 0
     while True:
         # print('in here')
-        quadro = obter_quadro(video, index)
+        try:
+            quadro = obter_quadro(yolo_realtime.out)
+        except:
+            quadro = None
         if quadro is not None:
             panel.configure(image=quadro)
             panel.image = quadro
-            index += 1
-        else:
-            index = 0
+
+def colorPlayer(panel):
+       while True:
+        # print('in here')
+        extract_monochromatic_colour.extract_color(cap, mask_low, mask_high)
+        quadro = obter_quadro(extract_monochromatic_colour.out)
+        if quadro is not None:
+            panel.configure(image=quadro)
+            panel.image = quadro
+
 
 def click1(event):
     # Obtém as coordenadas do clique
@@ -183,18 +193,31 @@ def return_images():
     panel3.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=40*largura_tela/864)
 
 
-def colorChoice(color): #3-array HSV
-    mask_low = [0,40,40]
-    mask_high = [0,255,255]
+def colorChoice(color): #3-array RGB
+    colorHSV = colorsys.rgb_to_hsv(color[0]/255, color[1]/255, color[2]/255)
+    global mask_low
+    global mask_high
+    mask_low = [0,0,0]
+    mask_high = [0,0,0]
 
-    mask_low[0] = (360-color[0])*255/360 - 20
-    mask_high[0] = (360-color[0])*255/360 + 20
+    mask_low = [max(floor((colorHSV[0])*255 - 30), 0), max(floor((colorHSV[1])*255 - 100), 0), max(floor((colorHSV[2])*255 - 100), 0)]
+    mask_high = [min(floor(colorHSV[0]*255 + 30), 255), min(floor(colorHSV[1]*255 + 100), 255), min(floor(colorHSV[2]*255 + 100), 255)]
+    
+    #Show color on the button
+    colorList = (math.floor(color[0]), math.floor(color[1]), math.floor(color[2]))
+    buttonColor = "#%02x%02x%02x" % colorList
+    colorButton.configure(bg=buttonColor)
+    
 
 # Crie a janela principal
 root = tk.Tk()
 root.title("SEDRO")
 root.state("zoomed")
 largura_tela, altura_tela = obter_dimensoes_tela()
+
+# Button to choose color
+colorButton = tk.Button(root, text='Changer couleur', command=lambda: colorChoice(colorchooser.askcolor(title="Choisir une couleur à détecter")[0]))
+colorButton.place(x=200, y=altura_tela - 100)
 
 map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
 video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
@@ -232,19 +255,30 @@ panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_scr
 panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
 
 
+cap = cv2.VideoCapture(0) 
+colorChoice((255,255,255))
+
 # Inicie a thread
 thread = Thread(target=MapLoop, args=(panel, img))
 thread2 = Thread(target=videoPlayer, args=(panel2,))
-thread3 = Thread(target=yolo_realtime.yolo_realtime_boot, args=(lock,))
+threadYolo = Thread(target=yolo_realtime.yolo_realtime_boot, args=(cap, lock,))
+threadColor = Thread(target=colorPlayer, args=(panel3,))
+
+
 thread.daemon = True 
 thread2.daemon = True 
-thread3.daemon = True 
+threadYolo.daemon = True 
+threadColor.daemon = True
 
 thread.start()
 thread2.start()
-thread3.start()
-
+threadYolo.start()
+threadColor.start()
 
 
 # Inicie o loop principal da interface gráfica
 root.mainloop()
+
+cap.release() 
+
+cv2.destroyAllWindows() 

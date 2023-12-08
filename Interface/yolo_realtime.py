@@ -19,8 +19,7 @@ import math
 
 
 # start webcam
-def yolo_realtime_boot(lock):
-    cap = cv.VideoCapture(0)
+def yolo_realtime_boot(cap, lock):
     cap.set(3, 1920)
     cap.set(4, 1080)
 
@@ -81,6 +80,4 @@ def yolo_realtime_boot(lock):
         global out
         out = img
 
-    cap.release()
-    cv.destroyAllWindows()
 
