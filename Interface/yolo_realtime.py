@@ -2,6 +2,7 @@ import cv2 as cv
 from cv2.dnn import NMSBoxes
 import numpy as np
 import time
+import os
 '''
 Ce programme utilise la bibliothèque OpenCV pour effectuer la détection d'objets en temps réel sur une vidéo 
 à l'aide de YOLOv8 (You Only Look Once version 8). Tout d'abord, il charge les noms de classes 
@@ -25,7 +26,8 @@ def yolo_realtime_boot(cap, lock):
 
     # model
     model = YOLO("yolo-Weights/yolov8n.pt")
-    # model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
+    #model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #uncomment to force the use of CPU (once you installed cuda for pytorch, it keeps using it by default)
     # pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
     # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 
     # Si ça marche pas peut être il faut installer CUDA 12.1 : https://developer.nvidia.com/cuda-toolkit

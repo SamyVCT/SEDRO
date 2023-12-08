@@ -114,7 +114,7 @@ lock = Lock()
 
 def obter_quadro(video):
     try:
-        quadro_redimensionado = Image.fromarray(video).resize(video_size)
+        quadro_redimensionado = Image.fromarray(cv2.cvtColor(video, cv2.COLOR_BGR2RGB)).resize(video_size).convert('RGBA')
         return ImageTk.PhotoImage(quadro_redimensionado)
   
     except Exception as e:
