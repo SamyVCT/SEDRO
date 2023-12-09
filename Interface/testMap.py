@@ -207,7 +207,21 @@ def colorChoice(color): #3-array RGB
     colorList = (math.floor(color[0]), math.floor(color[1]), math.floor(color[2]))
     buttonColor = "#%02x%02x%02x" % colorList
     colorButton.configure(bg=buttonColor)
+
+def changeCamera(i):
+    global cap
+    cap.release()
+    cap = cv2.VideoCapture(i)
     
+
+def updateCameras():
+    menuCamera.delete(0, 'end')
+    menuCamera.add_command(label="Update", command=lambda: updateCameras())
+    for i in range(0, 5):
+        cam = cv2.VideoCapture(i)
+        if cam.isOpened():
+            menuCamera.add_command(label="Camera " + str(i), command=lambda c=i:changeCamera(c))
+        cam.release()
 
 # Crie a janela principal
 root = tk.Tk()
@@ -215,9 +229,6 @@ root.title("SEDRO")
 root.state("zoomed")
 largura_tela, altura_tela = obter_dimensoes_tela()
 
-# Button to choose color
-colorButton = tk.Button(root, text='Changer couleur', command=lambda: colorChoice(colorchooser.askcolor(title="Choisir une couleur à détecter")[0]))
-colorButton.place(x=200, y=altura_tela - 100)
 
 map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
 video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
@@ -256,6 +267,22 @@ panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tel
 
 
 cap = cv2.VideoCapture(0) 
+
+# List of cameras menu
+zoneMenu = tk.Frame(root, borderwidth=3, bg='#557788')
+zoneMenu.grid(row=0,column=0)
+menuDerCameras = tk.Menubutton(zoneMenu, text="Cameras")
+menuDerCameras.grid(row=0,column=0)
+
+menuCamera = tk.Menu(menuDerCameras)
+updateCameras()
+menuDerCameras.config(menu=menuCamera)
+
+# Button to choose color
+colorButton = tk.Button(zoneMenu, text='Changer couleur', command=lambda: colorChoice(colorchooser.askcolor(title="Choisir une couleur à détecter")[0]))
+colorButton.grid(row=0,column=1)
+
+
 colorChoice((255,255,255))
 
 # Inicie a thread
@@ -270,10 +297,11 @@ thread2.daemon = True
 threadYolo.daemon = True 
 threadColor.daemon = True
 
-thread.start()
-thread2.start()
+
 threadYolo.start()
 threadColor.start()
+thread.start()
+thread2.start()
 
 
 # Inicie o loop principal da interface gráfica

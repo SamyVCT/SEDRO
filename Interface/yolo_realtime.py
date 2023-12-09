@@ -17,8 +17,6 @@ avec les boîtes englobantes et les étiquettes.
 from ultralytics import YOLO
 import math 
 
-
-
 # start webcam
 def yolo_realtime_boot(cap, lock):
     cap.set(3, 1920)
