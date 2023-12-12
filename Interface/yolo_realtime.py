@@ -15,17 +15,17 @@ indiquant le nom de la classe et la probabilité de détection. Enfin, le progra
 avec les boîtes englobantes et les étiquettes.
 '''
 from ultralytics import YOLO
+import cameraChooser
 import math 
 
 # start webcam
-def yolo_realtime_boot(cap, lock):
-    cap.set(3, 1920)
-    cap.set(4, 1080)
+def yolo_realtime_boot(lock):
+
 
     # model
     model = YOLO("yolo-Weights/yolov8n.pt")
     #model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #uncomment to force the use of CPU (once you installed cuda for pytorch, it keeps using it by default)
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #uncomment to force the use of CPU (once you installed cuda for pytorch, it keeps using it by default)
     # pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
     # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 
     # Si ça marche pas peut être il faut installer CUDA 12.1 : https://developer.nvidia.com/cuda-toolkit
@@ -47,7 +47,7 @@ def yolo_realtime_boot(cap, lock):
 
 
     while True:
-        success, img = cap.read()
+        success, img = cameraChooser.cap.read()
         results = model(img, stream=True, imgsz=640)
         # coordinates
         for r in results:
