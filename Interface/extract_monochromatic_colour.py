@@ -21,8 +21,7 @@ def extract_color(cap, mask_low, mask_high):
 		blue=cv2.bitwise_and(frame,frame,mask=b_mask) 
 		# this will give the color to mask. 
 
-		global out
-		out = blue
+		return blue
 	except:
 		pass
 

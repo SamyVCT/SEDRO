@@ -10,6 +10,7 @@ import sys
 import colorsys
 
 import yolo_realtime
+import cameraChooser
 import extract_monochromatic_colour
 import cv2
 from math import floor
@@ -135,8 +136,8 @@ def videoPlayer(panel):
 def colorPlayer(panel):
        while True:
         # print('in here')
-        extract_monochromatic_colour.extract_color(cap, mask_low, mask_high)
-        quadro = obter_quadro(extract_monochromatic_colour.out)
+        
+        quadro = obter_quadro(extract_monochromatic_colour.extract_color(cameraChooser.cap, mask_low, mask_high))
         if quadro is not None:
             panel.configure(image=quadro)
             panel.image = quadro
@@ -208,21 +209,6 @@ def colorChoice(color): #3-array RGB
     buttonColor = "#%02x%02x%02x" % colorList
     colorButton.configure(bg=buttonColor)
 
-def changeCamera(i):
-    global cap
-    cap.release()
-    cap = cv2.VideoCapture(i)
-    
-
-def updateCameras():
-    menuCamera.delete(0, 'end')
-    menuCamera.add_command(label="Update", command=lambda: updateCameras())
-    for i in range(0, 5):
-        cam = cv2.VideoCapture(i)
-        if cam.isOpened():
-            menuCamera.add_command(label="Camera " + str(i), command=lambda c=i:changeCamera(c))
-        cam.release()
-
 # Crie a janela principal
 root = tk.Tk()
 root.title("SEDRO")
@@ -263,8 +249,6 @@ panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_scr
 panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
 
 
-cap = cv2.VideoCapture(0) 
-
 # List of cameras menu
 zoneMenu = tk.Frame(root, borderwidth=3, bg='#557788')
 zoneMenu.grid(row=0,column=0)
@@ -272,7 +256,8 @@ menuDerCameras = tk.Menubutton(zoneMenu, text="Cameras")
 menuDerCameras.grid(row=0,column=0)
 
 menuCamera = tk.Menu(menuDerCameras)
-updateCameras()
+cameraChooser.updateCameras(menuCamera)
+cameraChooser.init()
 menuDerCameras.config(menu=menuCamera)
 
 # Button to choose color
@@ -285,7 +270,7 @@ colorChoice((255,255,255))
 # Inicie a thread
 thread = Thread(target=MapLoop, args=(panel, img))
 thread2 = Thread(target=videoPlayer, args=(panel2,))
-threadYolo = Thread(target=yolo_realtime.yolo_realtime_boot, args=(cap, lock,))
+threadYolo = Thread(target=yolo_realtime.yolo_realtime_boot, args=(lock,))
 threadColor = Thread(target=colorPlayer, args=(panel3,))
 
 
