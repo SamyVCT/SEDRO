@@ -240,13 +240,10 @@ root.configure(bg="#303030")
 
 panel = tk.Label(root)
 
-img = Image.open("Images/videodrone.png").resize(video_size).convert('RGBA')
+img = Image.open("Images/loading.png").convert('RGBA')
 img_tk = ImageTk.PhotoImage(img)
-panel2 = tk.Label(root, image = img_tk)
-
-
-img = Image.open("Images/videodrone.png").resize(third_size).convert('RGBA')
-img_tk = ImageTk.PhotoImage(img)
+panel = tk.Label(root, image = img_tk)
+panel2 = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
 panel3 = tk.Label(root, image = img_tk)
 
 panel.bind("<Button-1>", click1)  # <Button-1> representa o clique do botão esquerdo do mouse
