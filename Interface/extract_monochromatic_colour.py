@@ -1,10 +1,21 @@
 import cv2 
 import numpy as np 
+from multiprocessing import Manager
 
-
-def extract_color(cap, mask_low, mask_high):
+def extract_color(cap, mask_low, mask_high, globImage):
 	try:
 		ret,frame =cap.read() 
+		global image
+		image = frame
+
+		# Make the image global to all processes
+		if(len(globImage) == 0):
+			globImage.append(frame)
+			globImage.append(frame)
+			print(globImage)
+		globImage[0] = frame
+
+
 		# ret will return a true value if the frame exists otherwise False 
 		into_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) 
 		# changing the color format from BGr to HSV 

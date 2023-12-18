@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import colorchooser
 from threading import Thread
 from threading import Lock
+from multiprocessing import Process
+from multiprocessing import Manager
 import time
 import imageio
 import sys
@@ -110,8 +112,6 @@ def obter_dimensoes_tela():
     altura = root.winfo_screenheight()
     return largura, altura
 
-global lock
-lock = Lock()
 
 def obter_quadro(video):
     try:
@@ -126,18 +126,19 @@ def videoPlayer(panel):
     while True:
         # print('in here')
         try:
-            quadro = obter_quadro(yolo_realtime.out)
+            quadro = obter_quadro(globImage[1])
         except:
             quadro = None
         if quadro is not None:
             panel.configure(image=quadro)
             panel.image = quadro
 
+
 def colorPlayer(panel):
        while True:
         # print('in here')
         
-        quadro = obter_quadro(extract_monochromatic_colour.extract_color(cameraChooser.cap, mask_low, mask_high))
+        quadro = obter_quadro(extract_monochromatic_colour.extract_color(cameraChooser.cap, mask_low, mask_high, globImage))
         if quadro is not None:
             panel.configure(image=quadro)
             panel.image = quadro
@@ -201,94 +202,99 @@ def colorChoice(color): #3-array RGB
     mask_low = [0,0,0]
     mask_high = [0,0,0]
 
-    mask_low = [max(floor((colorHSV[0])*255 - 30), 0), max(floor((colorHSV[1])*255 - 100), 0), max(floor((colorHSV[2])*255 - 100), 0)]
-    mask_high = [min(floor(colorHSV[0]*255 + 30), 255), min(floor(colorHSV[1]*255 + 100), 255), min(floor(colorHSV[2]*255 + 100), 255)]
+    mask_low = [max(floor((colorHSV[0])*255 - 40), 0), max(floor((colorHSV[1])*255 - 100), 0), max(floor((colorHSV[2])*255 - 100), 0)]
+    mask_high = [min(floor(colorHSV[0]*255 + 40), 255), min(floor(colorHSV[1]*255 + 100), 255), min(floor(colorHSV[2]*255 + 100), 255)]
     
     #Show color on the button
     colorList = (math.floor(color[0]), math.floor(color[1]), math.floor(color[2]))
     buttonColor = "#%02x%02x%02x" % colorList
     colorButton.configure(bg=buttonColor)
 
-# Crie a janela principal
-root = tk.Tk()
-root.title("SEDRO")
-root.state("zoomed")
-largura_tela, altura_tela = obter_dimensoes_tela()
+
+if __name__ == "__main__":  # confirms that the code is under main function
+    # Crie a janela principal
+    root = tk.Tk()
+    root.title("SEDRO")
+    root.state("zoomed")
+    largura_tela, altura_tela = obter_dimensoes_tela()
 
 
-map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
 
 
-root.geometry(f"{largura_tela}x{altura_tela}")
-root.configure(bg="#303030")
+    root.geometry(f"{largura_tela}x{altura_tela}")
+    root.configure(bg="#303030")
 
-panel = tk.Label(root)
+    panel = tk.Label(root)
 
-img = Image.open("Images/loading.png").convert('RGBA')
-img_tk = ImageTk.PhotoImage(img)
-panel = tk.Label(root, image = img_tk)
-panel2 = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
-panel3 = tk.Label(root, image = img_tk)
+    img = Image.open("Images/loading.png").convert('RGBA')
+    img_tk = ImageTk.PhotoImage(img)
+    panel = tk.Label(root, image = img_tk)
+    #panel2 = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
+    panel2 = tk.Label(root, image = img_tk, compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
+    panel3 = tk.Label(root, image = img_tk)
 
-panel.bind("<Button-1>", click1)  # <Button-1> representa o clique do botão esquerdo do mouse
-panel2.bind("<Button-1>", click2)  # <Button-1> representa o clique do botão esquerdo do mouse
-panel3.bind("<Button-1>", click3)  # <Button-1> representa o clique do botão esquerdo do mouse
+    panel.bind("<Button-1>", click1)  # <Button-1> representa o clique do botão esquerdo do mouse
+    panel2.bind("<Button-1>", click2)  # <Button-1> representa o clique do botão esquerdo do mouse
+    panel3.bind("<Button-1>", click3)  # <Button-1> representa o clique do botão esquerdo do mouse
 
-panel.bind("<Enter>", lambda e: panel.config(cursor="hand2"))  # "hand2" indica um cursor de mão
-panel.bind("<Leave>", lambda e: panel.config(cursor=""))
+    panel.bind("<Enter>", lambda e: panel.config(cursor="hand2"))  # "hand2" indica um cursor de mão
+    panel.bind("<Leave>", lambda e: panel.config(cursor=""))
 
-panel2.bind("<Enter>", lambda e: panel2.config(cursor="hand2"))  # "hand2" indica um cursor de mão
-panel2.bind("<Leave>", lambda e: panel2.config(cursor=""))
+    panel2.bind("<Enter>", lambda e: panel2.config(cursor="hand2"))  # "hand2" indica um cursor de mão
+    panel2.bind("<Leave>", lambda e: panel2.config(cursor=""))
 
-root.bind("<Escape>", lambda e: return_images())
+    root.bind("<Escape>", lambda e: return_images())
 
-panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
-panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_screenwidth() - 750*largura_tela/1536)
-panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
-
-
-# List of cameras menu
-zoneMenu = tk.Frame(root, borderwidth=3, bg='#557788')
-zoneMenu.grid(row=0,column=0)
-menuDerCameras = tk.Menubutton(zoneMenu, text="Cameras")
-menuDerCameras.grid(row=0,column=0)
-
-menuCamera = tk.Menu(menuDerCameras)
-cameraChooser.updateCameras(menuCamera)
-cameraChooser.init()
-menuDerCameras.config(menu=menuCamera)
-
-# Button to choose color
-colorButton = tk.Button(zoneMenu, text='Changer couleur', command=lambda: colorChoice(colorchooser.askcolor(title="Choisir une couleur à détecter")[0]))
-colorButton.grid(row=0,column=1)
+    panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
+    panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_screenwidth() - 750*largura_tela/1536)
+    panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
 
 
-colorChoice((255,255,255))
+    # List of cameras menu
+    zoneMenu = tk.Frame(root, borderwidth=3, bg='#557788')
+    zoneMenu.grid(row=0,column=0)
+    menuDerCameras = tk.Menubutton(zoneMenu, text="Cameras")
+    menuDerCameras.grid(row=0,column=0)
 
-# Inicie a thread
-thread = Thread(target=MapLoop, args=(panel, img))
-thread2 = Thread(target=videoPlayer, args=(panel2,))
-threadYolo = Thread(target=yolo_realtime.yolo_realtime_boot, args=(lock,))
-threadColor = Thread(target=colorPlayer, args=(panel3,))
-
-
-thread.daemon = True 
-thread2.daemon = True 
-threadYolo.daemon = True 
-threadColor.daemon = True
-
-
-threadYolo.start()
-threadColor.start()
-thread.start()
-thread2.start()
+    menuCamera = tk.Menu(menuDerCameras)
+    cameraChooser.updateCameras(menuCamera)
+    cameraChooser.init()
+    menuDerCameras.config(menu=menuCamera)
+    # Button to choose color
+    colorButton = tk.Button(zoneMenu, text='Changer couleur', command=lambda: colorChoice(colorchooser.askcolor(title="Choisir une couleur à détecter")[0]))
+    colorButton.grid(row=0,column=1)
 
 
-# Inicie o loop principal da interface gráfica
-root.mainloop()
+    colorChoice((255,255,255))
 
-cap.release() 
+    # Inicie a thread
+    thread = Thread(target=MapLoop, args=(panel, img))
+    thread2 = Thread(target=videoPlayer, args=(panel2,))
 
-cv2.destroyAllWindows() 
+    globImage = Manager().list()
+
+    processYolo = Process(target=yolo_realtime.yolo_realtime_boot, args=(globImage,))
+    processYolo.start()
+
+    threadColor = Thread(target=colorPlayer, args=(panel3,))
+
+
+    thread.daemon = True 
+    thread2.daemon = True 
+    #threadYolo.daemon = True 
+    threadColor.daemon = True
+
+
+    threadColor.start()
+    thread.start()
+    thread2.start()
+
+
+    # Inicie o loop principal da interface gráfica
+    root.mainloop()
+
+    cameraChooser.cap.release()
+    cv2.destroyAllWindows() 

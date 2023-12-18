@@ -18,7 +18,7 @@ import math
 import os
 
 # start webcam
-cap = cv.VideoCapture("../DJI_0016_W - Trim.MP4")
+cap = cv.VideoCapture("../../DJI_0367.mp4")
 cap.set(3, 1920)
 cap.set(4, 1080)
 

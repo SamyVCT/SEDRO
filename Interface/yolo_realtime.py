@@ -3,6 +3,8 @@ from cv2.dnn import NMSBoxes
 import numpy as np
 import time
 import os
+import extract_monochromatic_colour
+from multiprocessing import Manager
 '''
 Ce programme utilise la bibliothèque OpenCV pour effectuer la détection d'objets en temps réel sur une vidéo 
 à l'aide de YOLOv8 (You Only Look Once version 8). Tout d'abord, il charge les noms de classes 
@@ -19,12 +21,12 @@ import cameraChooser
 import math 
 
 # start webcam
-def yolo_realtime_boot(lock):
+def yolo_realtime_boot(globImage):
 
 
     # model
     model = YOLO("yolo-Weights/yolov8n.pt")
-    #model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
+    model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
     #os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #uncomment to force the use of CPU (once you installed cuda for pytorch, it keeps using it by default)
     # pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
     # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 
@@ -45,9 +47,14 @@ def yolo_realtime_boot(lock):
                 "teddy bear", "hair drier", "toothbrush"
                 ]
 
-
     while True:
-        success, img = cameraChooser.cap.read()
+        # Get image from other process manager globIm
+        if(len(globImage) == 0):
+            print("No image found")
+            continue
+        img = globImage[0]
+
+        #success, img = cameraChooser.cap.read()
         results = model(img, stream=True, imgsz=640)
         # coordinates
         for r in results:
@@ -79,5 +86,6 @@ def yolo_realtime_boot(lock):
                 cv.putText(img, classNames[cls] + " confiance : " + str(confidence), org, font, fontScale, color, thickness)
         global out
         out = img
+        globImage[1] = img
 
 
