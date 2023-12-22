@@ -26,7 +26,7 @@ def yolo_realtime_boot(globImage):
 
     # model
     model = YOLO("yolo-Weights/yolov8n.pt")
-    model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
+    #model.to('cuda') # uncomment this line if you want to use GPU - needs CUDA to be installed on your system 
     #os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #uncomment to force the use of CPU (once you installed cuda for pytorch, it keeps using it by default)
     # pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
     # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 

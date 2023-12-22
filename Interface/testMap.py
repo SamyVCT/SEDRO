@@ -112,36 +112,39 @@ def obter_dimensoes_tela():
     altura = root.winfo_screenheight()
     return largura, altura
 
-
-def obter_quadro(video):
+# Transforme les frames de la caméra en images tkinter
+def get_frame(video):
     try:
-        quadro_redimensionado = Image.fromarray(cv2.cvtColor(video, cv2.COLOR_BGR2RGB)).resize(video_size).convert('RGBA')
-        return ImageTk.PhotoImage(quadro_redimensionado)
+        frame_dimensionned = Image.fromarray(cv2.cvtColor(video, cv2.COLOR_BGR2RGB)).resize(video_size).convert('RGBA')
+        return ImageTk.PhotoImage(frame_dimensionned)
   
     except Exception as e:
         print(e)
         return None
 
-def videoPlayer(panel):
+# Boucle while récupérant et affichant les images de la caméra traitées par yolo
+def yoloVideoPlayer(panel):
     while True:
         # print('in here')
         try:
-            quadro = obter_quadro(globImage[1])
+            frame = get_frame(globImage[1])
         except:
-            quadro = None
-        if quadro is not None:
-            panel.configure(image=quadro)
-            panel.image = quadro
+            frame = None
+        if frame is not None:
+            panel.configure(image=frame)
+            panel.image = frame
 
-
-def colorPlayer(panel):
+# Boucle while affichant les images de la caméra avec le filtre de couleur
+def colorVideoPlayer(panel):
        while True:
         # print('in here')
-        
-        quadro = obter_quadro(extract_monochromatic_colour.extract_color(cameraChooser.cap, mask_low, mask_high, globImage))
-        if quadro is not None:
-            panel.configure(image=quadro)
-            panel.image = quadro
+        try:
+            frame = get_frame(extract_monochromatic_colour.extract_color(cameraChooser.cap, mask_low, mask_high, globImage))
+        except:
+            frame = None
+        if frame is not None:
+            panel.configure(image=frame)
+            panel.image = frame
 
 
 def click1(event):
@@ -187,12 +190,12 @@ def click3(event):
 def return_images():
     global map_size
     global video_size
-    map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-    video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-    third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-    panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
-    panel2.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=root.winfo_screenwidth() - 750*largura_tela/1536)
-    panel3.place(y=root.winfo_screenheight() - 460*altura_tela/1536, x=40*largura_tela/864)
+    map_size = (int(700*width/1536), int(350*height/864))
+    video_size = (int(700*width/1536), int(350*height/864))
+    third_size = (int(700*width/1536), int(350*height/864))
+    panel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
+    panel2.place(y=root.winfo_screenheight() - 460*height/1536, x=root.winfo_screenwidth() - 750*width/1536)
+    panel3.place(y=root.winfo_screenheight() - 460*height/1536, x=40*width/864)
 
 
 def colorChoice(color): #3-array RGB
@@ -212,19 +215,19 @@ def colorChoice(color): #3-array RGB
 
 
 if __name__ == "__main__":  # confirms that the code is under main function
-    # Crie a janela principal
+    # Créer la fenetre principale
     root = tk.Tk()
     root.title("SEDRO")
     root.state("zoomed")
-    largura_tela, altura_tela = obter_dimensoes_tela()
+    width, height = obter_dimensoes_tela()
 
 
-    map_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-    video_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
-    third_size = (int(700*largura_tela/1536), int(350*altura_tela/864))
+    map_size = (int(700*width/1536), int(350*height/864))
+    video_size = (int(700*width/1536), int(350*height/864))
+    third_size = (int(700*width/1536), int(350*height/864))
 
 
-    root.geometry(f"{largura_tela}x{altura_tela}")
+    root.geometry(f"{width}x{height}")
     root.configure(bg="#303030")
 
     panel = tk.Label(root)
@@ -248,9 +251,9 @@ if __name__ == "__main__":  # confirms that the code is under main function
 
     root.bind("<Escape>", lambda e: return_images())
 
-    panel.place(x=root.winfo_screenwidth() - 750*largura_tela/1536, y=20*altura_tela/864)
-    panel2.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=root.winfo_screenwidth() - 750*largura_tela/1536)
-    panel3.place(y=root.winfo_screenheight() - 460*altura_tela/864, x=25*largura_tela/864)
+    panel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
+    panel2.place(y=root.winfo_screenheight() - 460*height/864, x=root.winfo_screenwidth() - 750*width/1536)
+    panel3.place(y=root.winfo_screenheight() - 460*height/864, x=25*width/864)
 
 
     # List of cameras menu
@@ -270,30 +273,27 @@ if __name__ == "__main__":  # confirms that the code is under main function
 
     colorChoice((255,255,255))
 
-    # Inicie a thread
-    thread = Thread(target=MapLoop, args=(panel, img))
-    thread2 = Thread(target=videoPlayer, args=(panel2,))
+    # Lancement des differents threads et processus : parallélisation des tâches
+    threadMap = Thread(target=MapLoop, args=(panel, img))
+    threadVideoYolo = Thread(target=yoloVideoPlayer, args=(panel2,))
+    threadVideoColor = Thread(target=colorVideoPlayer, args=(panel3,))
 
-    globImage = Manager().list()
+    threadMap.daemon = True 
+    threadVideoColor.daemon = True 
+    threadVideoYolo.daemon = True
+
+    globImage = Manager().list() # Mémoire partagée entre les processus
 
     processYolo = Process(target=yolo_realtime.yolo_realtime_boot, args=(globImage,))
+
+    # Lancement des processus et threads
     processYolo.start()
-
-    threadColor = Thread(target=colorPlayer, args=(panel3,))
-
-
-    thread.daemon = True 
-    thread2.daemon = True 
-    #threadYolo.daemon = True 
-    threadColor.daemon = True
+    threadVideoColor.start()
+    threadMap.start()
+    threadVideoYolo.start()
 
 
-    threadColor.start()
-    thread.start()
-    thread2.start()
-
-
-    # Inicie o loop principal da interface gráfica
+    # Intialiser la boucle principale
     root.mainloop()
 
     cameraChooser.cap.release()
