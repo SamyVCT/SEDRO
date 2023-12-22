@@ -17,6 +17,12 @@ import extract_monochromatic_colour
 import cv2
 from math import floor
 
+
+##############################################################################################################
+# Partie purement graphique de l'interface                                                                   #
+##############################################################################################################
+
+
 def polygonDirection(angle1, angle2, width, height):
     center = (width/2, height/2)
 
@@ -53,7 +59,7 @@ def polygonDirection(angle1, angle2, width, height):
 
     return [(width/2, height/2), point1, point2]
 
-def drawMap(color, angles, points, areas,panel):
+def drawMap(color, angles, points, areas,mapPanel):
     im = Image.open("Images/basedrone2.png").resize(map_size).convert('RGBA')
     width, height = im.width, im.height
     drone = Image.open("Images/drone.png").resize((50,25)).convert('RGBA')
@@ -85,10 +91,10 @@ def drawMap(color, angles, points, areas,panel):
 
     photo = ImageTk.PhotoImage(im)
 
-    panel.configure(image=photo)
-    panel.image = photo
+    mapPanel.configure(image=photo)
+    mapPanel.image = photo
 
-def MapLoop(panel, im):
+def MapLoop(mapPanel, im):
     a1 = 0
     a2 = 20
 
@@ -101,13 +107,14 @@ def MapLoop(panel, im):
     y2 = 300
 
     while(1):
-        drawMap('green', [(a1,a2), (a3,a4)], [(x1,y1,'blue'), (x2,y2, 'yellow')], [(300, 500, 50, '#f3000faa')],panel)
+        drawMap('green', [(a1,a2), (a3,a4)], [(x1,y1,'blue'), (x2,y2, 'yellow')], [(300, 500, 50, '#f3000faa')],mapPanel)
         a1 += 1
         a2 += 1
         a3 += 1
         a4 += 1
-    
-def obter_dimensoes_tela():
+
+# Retourne les dimensions de l'écran
+def getScreenSize():
     largura = root.winfo_screenwidth()
     altura = root.winfo_screenheight()
     return largura, altura
@@ -121,9 +128,45 @@ def get_frame(video):
     except Exception as e:
         print(e)
         return None
+    
+def click(event, panelClicked):
+    # Récuperer les coordonnées du clic
+    x, y = event.x, event.y
+
+    global third_size
+    global video_size
+    global map_size
+
+    third_size = getScreenSize()
+    video_size = getScreenSize()
+    map_size = getScreenSize()
+
+    mapPanel.place_forget()
+    yoloPanel.place_forget()
+    colorPanel.place_forget()
+
+    panelClicked.place(x = 0, y = 0)
+
+# Retourne toutes les fenêtres à la normale
+def return_images():
+    global map_size
+    global video_size
+    global third_size
+    map_size = (int(700*width/1536), int(350*height/864))
+    video_size = (int(700*width/1536), int(350*height/864))
+    third_size = (int(700*width/1536), int(350*height/864))
+    mapPanel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
+    yoloPanel.place(y=root.winfo_screenheight() - 460*height/864, x=root.winfo_screenwidth() - 750*width/1536)
+    colorPanel.place(y=root.winfo_screenheight() - 460*height/864, x=25*width/864)
+
+
+##############################################################################################################
+# Partie purement fonctionnelle de l'interface                                                               #
+##############################################################################################################
+
 
 # Boucle while récupérant et affichant les images de la caméra traitées par yolo
-def yoloVideoPlayer(panel):
+def yoloVideoPlayer(mapPanel):
     while True:
         # print('in here')
         try:
@@ -131,11 +174,11 @@ def yoloVideoPlayer(panel):
         except:
             frame = None
         if frame is not None:
-            panel.configure(image=frame)
-            panel.image = frame
+            mapPanel.configure(image=frame)
+            mapPanel.image = frame
 
 # Boucle while affichant les images de la caméra avec le filtre de couleur
-def colorVideoPlayer(panel):
+def colorVideoPlayer(mapPanel):
        while True:
         # print('in here')
         try:
@@ -143,59 +186,8 @@ def colorVideoPlayer(panel):
         except:
             frame = None
         if frame is not None:
-            panel.configure(image=frame)
-            panel.image = frame
-
-
-def click1(event):
-    # Obtém as coordenadas do clique
-    x, y = event.x, event.y
-    print(f"Clique 1: Clique detectado em ({x}, {y})")
-
-    global map_size
-    map_size = obter_dimensoes_tela()
-
-    panel2.place_forget()
-    panel3.place_forget()
-    panel.place(x = 0, y = 0)
-
-def click2(event):
-    # Obtém as coordenadas do clique
-    x, y = event.x, event.y
-    print(f"Click 2: Clique detectado em ({x}, {y})")
-
-    global video_size
-    video_size = obter_dimensoes_tela()
-
-    panel.place_forget()
-    panel3.place_forget()
-    panel2.place(x = 0, y = 0)
-
-def click3(event):
-    # Obtém as coordenadas do clique
-    x, y = event.x, event.y
-    print(f"Click 3: Clique detectado em ({x}, {y})")
-
-    global third_size
-    third_size = obter_dimensoes_tela()
-
-    panel.place_forget()
-    panel2.place_forget()
-
-    img = Image.open("Images/videodrone.png").resize(third_size).convert('RGBA')
-    img_tk = ImageTk.PhotoImage(img)
-    panel3 = tk.Label(root, image = img_tk)
-    panel3.place(x = 0, y = 0)
-
-def return_images():
-    global map_size
-    global video_size
-    map_size = (int(700*width/1536), int(350*height/864))
-    video_size = (int(700*width/1536), int(350*height/864))
-    third_size = (int(700*width/1536), int(350*height/864))
-    panel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
-    panel2.place(y=root.winfo_screenheight() - 460*height/1536, x=root.winfo_screenwidth() - 750*width/1536)
-    panel3.place(y=root.winfo_screenheight() - 460*height/1536, x=40*width/864)
+            mapPanel.configure(image=frame)
+            mapPanel.image = frame
 
 
 def colorChoice(color): #3-array RGB
@@ -214,12 +206,16 @@ def colorChoice(color): #3-array RGB
     colorButton.configure(bg=buttonColor)
 
 
+##############################################################################################################
+# Partie principale de l'interface                                                                           #
+##############################################################################################################
+
 if __name__ == "__main__":  # confirms that the code is under main function
     # Créer la fenetre principale
     root = tk.Tk()
     root.title("SEDRO")
     root.state("zoomed")
-    width, height = obter_dimensoes_tela()
+    width, height = getScreenSize()
 
 
     map_size = (int(700*width/1536), int(350*height/864))
@@ -230,30 +226,33 @@ if __name__ == "__main__":  # confirms that the code is under main function
     root.geometry(f"{width}x{height}")
     root.configure(bg="#303030")
 
-    panel = tk.Label(root)
+    mapPanel = tk.Label(root)
 
     img = Image.open("Images/loading.png").convert('RGBA')
     img_tk = ImageTk.PhotoImage(img)
-    panel = tk.Label(root, image = img_tk)
-    #panel2 = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
-    panel2 = tk.Label(root, image = img_tk, compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
-    panel3 = tk.Label(root, image = img_tk)
+    mapPanel = tk.Label(root, image = img_tk)
+    #yoloPanel = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
+    yoloPanel = tk.Label(root, image = img_tk, compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
+    colorPanel = tk.Label(root, image = img_tk)
 
-    panel.bind("<Button-1>", click1)  # <Button-1> representa o clique do botão esquerdo do mouse
-    panel2.bind("<Button-1>", click2)  # <Button-1> representa o clique do botão esquerdo do mouse
-    panel3.bind("<Button-1>", click3)  # <Button-1> representa o clique do botão esquerdo do mouse
+    mapPanel.bind("<Button-1>", lambda e: click(e, mapPanel)) # <Button-1> est le clic gauche de la souris
+    yoloPanel.bind("<Button-1>", lambda e: click(e, yoloPanel)) 
+    colorPanel.bind("<Button-1>", lambda e: click(e, colorPanel))
 
-    panel.bind("<Enter>", lambda e: panel.config(cursor="hand2"))  # "hand2" indica um cursor de mão
-    panel.bind("<Leave>", lambda e: panel.config(cursor=""))
+    mapPanel.bind("<Enter>", lambda e: mapPanel.config(cursor="hand2"))  # "hand2" est un curseur de main
+    mapPanel.bind("<Leave>", lambda e: mapPanel.config(cursor=""))
 
-    panel2.bind("<Enter>", lambda e: panel2.config(cursor="hand2"))  # "hand2" indica um cursor de mão
-    panel2.bind("<Leave>", lambda e: panel2.config(cursor=""))
+    yoloPanel.bind("<Enter>", lambda e: yoloPanel.config(cursor="hand2"))  # "hand2" est un curseur de main
+    yoloPanel.bind("<Leave>", lambda e: yoloPanel.config(cursor=""))
+
+    colorPanel.bind("<Enter>", lambda e: colorPanel.config(cursor="hand2"))  # "hand2" est un curseur de main
+    colorPanel.bind("<Leave>", lambda e: colorPanel.config(cursor=""))
 
     root.bind("<Escape>", lambda e: return_images())
 
-    panel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
-    panel2.place(y=root.winfo_screenheight() - 460*height/864, x=root.winfo_screenwidth() - 750*width/1536)
-    panel3.place(y=root.winfo_screenheight() - 460*height/864, x=25*width/864)
+    mapPanel.place(x=root.winfo_screenwidth() - 750*width/1536, y=20*height/864)
+    yoloPanel.place(y=root.winfo_screenheight() - 460*height/864, x=root.winfo_screenwidth() - 750*width/1536)
+    colorPanel.place(y=root.winfo_screenheight() - 460*height/864, x=25*width/864)
 
 
     # List of cameras menu
@@ -274,9 +273,9 @@ if __name__ == "__main__":  # confirms that the code is under main function
     colorChoice((255,255,255))
 
     # Lancement des differents threads et processus : parallélisation des tâches
-    threadMap = Thread(target=MapLoop, args=(panel, img))
-    threadVideoYolo = Thread(target=yoloVideoPlayer, args=(panel2,))
-    threadVideoColor = Thread(target=colorVideoPlayer, args=(panel3,))
+    threadMap = Thread(target=MapLoop, args=(mapPanel, img))
+    threadVideoYolo = Thread(target=yoloVideoPlayer, args=(yoloPanel,))
+    threadVideoColor = Thread(target=colorVideoPlayer, args=(colorPanel,))
 
     threadMap.daemon = True 
     threadVideoColor.daemon = True 
