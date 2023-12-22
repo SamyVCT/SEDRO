@@ -32,8 +32,6 @@ def yolo_realtime_boot(globImage):
     # pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 
     # Si ça marche pas peut être il faut installer CUDA 12.1 : https://developer.nvidia.com/cuda-toolkit
 
-    #model = YOLO("yolo-Weights/yolov8n.pt") : ultralytics downloads the latest model of yolov8 (ONLY WORKS IF YOU'RE ONLINE)
-
     # object classes
     classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat",
                 "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat",
@@ -48,15 +46,16 @@ def yolo_realtime_boot(globImage):
                 ]
 
     while True:
-        # Get image from other process manager globIm
+        # Get image from other process manager globImage
+        # Récupère l'image depuis le processus manager globImage
         if(len(globImage) == 0):
             print("No image found")
             continue
         img = globImage[0]
-
-        #success, img = cameraChooser.cap.read()
+        
+        # Perform object detection on the frame. imgsz is the size at which the image is fed to the model.
         results = model(img, stream=True, imgsz=640)
-        # coordinates
+        
         for r in results:
             boxes = r.boxes
 
@@ -84,8 +83,6 @@ def yolo_realtime_boot(globImage):
                 thickness = 2
 
                 cv.putText(img, classNames[cls] + " confiance : " + str(confidence), org, font, fontScale, color, thickness)
-        global out
-        out = img
         globImage[1] = img
 
 
