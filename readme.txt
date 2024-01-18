@@ -32,7 +32,7 @@ Liste des bibliothèques à installer :
 Pour démarrer le programme : 
 lancer le script "main.py" DEPUIS LE DOSSIER /Interface/
 
-Attendre pour le lancer de yolo, qui peut prendre un petit peu de temps selon la configuration.
+Attendre pour le démarrage de yolo, qui peut prendre un petit peu de temps selon la configuration.
 
 Si l'ordinateur n'est pas équipé d'une carte graphique Nvidia : il pourrait être nécessaire de mettre en commentaire la ligne model.to('cuda') dans le fichier yolo_realtime.py
 
