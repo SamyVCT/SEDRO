@@ -6,7 +6,7 @@ Les objectifs sont multiples :
 
 Une interface rassemblant les flux vidéo de chaque traitement et les données du capteur a été développée.
 
-Pour l'instant, nous ne cherchons pas à paralléliser les calculs sur les coeurs du CPU. La GPU GeForce RTX 3070 est assez rapide pour traiter avec Yolo en temps réelle des images 1920x1080.
+Pour l'instant, nous ne cherchons pas à paralléliser les calculs sur les coeurs du CPU. Le GPU GeForce RTX 3070 est assez rapide pour traiter avec Yolo en temps réel des images 1920x1080.
 
 Utilisation de Github : 
  - pour les fichiers de plus de 100MB (weights), ajouter dans .gitignore et télécharger le fichier sur le drive
@@ -26,7 +26,11 @@ Installation (Pas fini):
 
 Liste des bibliothèques à installer :
 - ultralytics
-- 
+- tk
+- Pillow
+- imageio
+- opencv-python
+- pip3 install torchvision==0.16.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html3           |||| Obligatoire pour utiliser cuda (carte graphique)
 
 
 Pour démarrer le programme : 
