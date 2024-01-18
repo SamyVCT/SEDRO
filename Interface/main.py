@@ -207,7 +207,7 @@ def colorChoice(color): #3-array RGB
 
 
 ##############################################################################################################
-# Partie principale de l'interface                                                                           #
+#                                Partie principale de l'interface                                            #
 ##############################################################################################################
 
 if __name__ == "__main__":  # confirms that the code is under main function

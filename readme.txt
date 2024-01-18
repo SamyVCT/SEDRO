@@ -11,3 +11,31 @@ Pour l'instant, nous ne cherchons pas à paralléliser les calculs sur les coeur
 Utilisation de Github : 
  - pour les fichiers de plus de 100MB (weights), ajouter dans .gitignore et télécharger le fichier sur le drive
 
+
+Informations : 
+TOUT LE CODE ACTUELLEMENT UTILISE EST LOCALISE DANS /Interface/
+Le logiciel utilise les caméras de l'ordinateur comme entrée de flux vidéo. Il est nécessaire d'utiliser le bouton update dans le menu des caméras de l'interface si vous branchez une caméra après le lancement du logiciel.
+(la carte d'acquisition fonctionne comme une webcam du point de vue de l'ordinateur).
+Parfois le changement de caméra peut faire freeze l'application (elle ne répond plus). Dans ce cas, il suffit d'attendre, ça finira par revenir (ça peut être assez long selon la configuration de l'ordinateur)
+
+Le logiciel est encore dans sa version béta. Il n'est pas optimisé et des bugs peuvent être présents.
+
+
+Installation (Pas fini):
+
+
+Liste des bibliothèques à installer :
+- ultralytics
+- 
+
+
+Pour démarrer le programme : 
+lancer le script "main.py" DEPUIS LE DOSSIER /Interface/
+
+Attendre pour le lancer de yolo, qui peut prendre un petit peu de temps selon la configuration.
+
+Si l'ordinateur n'est pas équipé d'une carte graphique Nvidia : il pourrait être nécessaire de mettre en commentaire la ligne model.to('cuda') dans le fichier yolo_realtime.py
+
+
+
+
