@@ -60,6 +60,8 @@ def yolo_realtime_boot(globImage):
             boxes = r.boxes
 
             for box in boxes:
+                cls = int(box.cls[0])
+                    #print("Class name -->", classNames[cls])
                 classWritten = ""
                 if cls < 3 or classNames[cls] == "téléphone":
                     classWritten = classNames[cls]
@@ -79,8 +81,7 @@ def yolo_realtime_boot(globImage):
                     #print("Confidence --->",confidence)
 
                     # class name
-                    cls = int(box.cls[0])
-                    #print("Class name -->", classNames[cls])
+                    
 
                     # object details
                     org = [x1, y1]
