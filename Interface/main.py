@@ -17,6 +17,16 @@ import extract_monochromatic_colour
 import cv2
 from math import floor
 
+import os
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 ##############################################################################################################
 # Partie purement graphique de l'interface                                                                   #
@@ -60,9 +70,9 @@ def polygonDirection(angle1, angle2, width, height):
     return [(width/2, height/2), point1, point2]
 
 def drawMap(color, angles, points, areas,mapPanel):
-    im = Image.open("Images/basedrone2.png").resize(map_size).convert('RGBA')
+    im = Image.open(resource_path("basedrone2.png")).resize(map_size).convert('RGBA')
     width, height = im.width, im.height
-    drone = Image.open("Images/drone.png").resize((50,25)).convert('RGBA')
+    drone = Image.open(resource_path("drone.png")).resize((50,25)).convert('RGBA')
     d = ImageDraw.Draw(im)
     widthDrone, heightDrone = drone.size
     #print(angles[0][0], angles[0][1])
@@ -228,7 +238,7 @@ if __name__ == "__main__":  # confirms that the code is under main function
 
     mapPanel = tk.Label(root)
 
-    img = Image.open("Images/loading.png").convert('RGBA')
+    img = Image.open(resource_path("loading.png")).convert('RGBA')
     img_tk = ImageTk.PhotoImage(img)
     mapPanel = tk.Label(root, image = img_tk)
     #yoloPanel = tk.Label(root, image = img_tk, text="Le chargement peut être long,      \n veuillez patienter.", compound=tk.RIGHT, font=("Arial", 15), bg="#303030", fg="white")
@@ -270,7 +280,7 @@ if __name__ == "__main__":  # confirms that the code is under main function
     colorButton.grid(row=0,column=1)
 
 
-    colorChoice((255,255,255))
+    colorChoice([255,255,255])
 
     # Lancement des differents threads et processus : parallélisation des tâches
     threadMap = Thread(target=MapLoop, args=(mapPanel, img))
