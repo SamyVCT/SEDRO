@@ -54,7 +54,7 @@ def yolo_realtime_boot(globImage):
         img = globImage[0]
         
         # Perform object detection on the frame. imgsz is the size at which the image is fed to the model.
-        results = model(img, stream=True, imgsz=640)
+        results = model(img, stream=True, imgsz=1280)
         
         for r in results:
             boxes = r.boxes
