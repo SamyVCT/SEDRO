@@ -201,7 +201,7 @@ def colorVideoPlayer(mapPanel):
 
 
 def colorChoice(color): #3-array RGB
-    colorHSV = colorsys.rgb_to_hsv(color[0]/255, color[1]/255, color[2]/255)
+    colorHSV = colorsys.rgb_to_hls(color[0]/255, color[1]/255, color[2]/255)
     global mask_low
     global mask_high
     mask_low = [0,0,0]
