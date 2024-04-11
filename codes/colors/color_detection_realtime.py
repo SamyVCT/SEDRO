@@ -6,7 +6,7 @@ import cv2
 
 
 # Capturing video through webcam 
-webcam = cv2.VideoCapture(0) 
+webcam = cv2.VideoCapture(2) 
 
 # Start a while loop 
 while(1): 

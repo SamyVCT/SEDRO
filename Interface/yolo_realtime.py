@@ -5,6 +5,7 @@ import time
 import os
 import extract_monochromatic_colour
 from multiprocessing import Manager
+from datetime import datetime
 '''
 Ce programme utilise la bibliothèque OpenCV pour effectuer la détection d'objets en temps réel sur une vidéo 
 à l'aide de YOLOv8 (You Only Look Once version 8). Tout d'abord, il charge les noms de classes 
@@ -33,17 +34,19 @@ def yolo_realtime_boot(globImage):
     # Si ça marche pas peut être il faut installer CUDA 12.1 : https://developer.nvidia.com/cuda-toolkit
 
     # object classes
-    classNames = ["personne", "vélo", "voiture", "moto", "aeroplane", "bus", "train", "camion", "boat",
+    classNames = ["personne", "vélo", "voiture", "moto", "personne (c)", "bus", "train", "camion", "boat",
                 "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat",
                 "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella",
                 "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat",
                 "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup",
                 "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli",
                 "carrot", "hot dog", "pizza", "donut", "cake", "chair", "sofa", "pottedplant", "bed",
-                "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "téléphone",
+                "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "telephone",
                 "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors",
                 "teddy bear", "hair drier", "toothbrush"
                 ]
+
+    showClasses = [0,1,2,3,4,24,25,26,30,31] # Changer ici pour afficher la detection d'autres classes. Attention : ils faut compter à partir de 0
 
     while True:
         # Get image from other process manager globImage
@@ -54,33 +57,31 @@ def yolo_realtime_boot(globImage):
         img = globImage[0]
         
         # Perform object detection on the frame. imgsz is the size at which the image is fed to the model.
-        results = model(img, stream=True, imgsz=640)
+        results = model(img, stream=True, imgsz=1920)
         
         for r in results:
             boxes = r.boxes
 
             for box in boxes:
+                cls = int(box.cls[0])
+                    #print("Class name -->", classNames[cls])
                 classWritten = ""
-                if cls < 3 or classNames[cls] == "téléphone":
+                if cls in showClasses or classNames[cls] == "telephone":
                     classWritten = classNames[cls]
-                elif cls == 4:
-                    classWritten = "personne (corrigé)"
-                
+
                 if classWritten != "":
                     # bounding box
                     x1, y1, x2, y2 = box.xyxy[0]
                     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) # convert to int values
 
                     # put box in cam
-                    cv.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
+                   
 
                     # confidence
                     confidence = math.ceil((box.conf[0]*100))/100
                     #print("Confidence --->",confidence)
-
-                    # class name
-                    cls = int(box.cls[0])
-                    #print("Class name -->", classNames[cls])
+                    cv.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255*confidence), int(5*confidence))
+                    cv.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255*confidence), int(5*confidence))
 
                     # object details
                     org = [x1, y1]
@@ -89,7 +90,12 @@ def yolo_realtime_boot(globImage):
                     color = (255, 0, 0)
                     thickness = 2
 
-                    cv.putText(img, classNames[cls] + " confiance : " + str(confidence), org, font, fontScale, color, thickness)
+                    cv.putText(img, classNames[cls], org, font, fontScale, color, thickness)
+
+
+                    detectionList = globImage[2]
+                    detectionList.append(datetime.now().strftime("%H:%M:%S") + " " + classNames[cls] + " - Confiance : " + str(confidence))
+                    globImage[2] = detectionList
         globImage[1] = img
 
 
