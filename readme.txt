@@ -8,10 +8,6 @@ Une interface rassemblant les flux vidéos de chaque traitement a été dévelop
 
 Les différents traitements sont effectués en parallèle. Le GPU GeForce RTX 3070 est assez rapide pour traiter avec Yolo en temps réel des images 1920x1080.
 
-Utilisation de GitHub : 
- - pour les fichiers de plus de 100MB (weights), ajouter dans .gitignore et télécharger le fichier sur le drive.
- - Si vous souhaitez obtenir l'accès au GitHub afin de pouvoir commit, envoyez un mail à : samy.vincent@ensta-paris.fr
-
 
 Informations : 
 TOUT LE CODE ACTUELLEMENT UTILISE EST LOCALISE DANS /SEDRO/
@@ -52,6 +48,10 @@ Si l'ordinateur n'est pas équipé d'une carte graphique Nvidia : il pourrait ê
 ///// Notes aux futurs développeurs ///// 
 Les codes ont été commentés afin d'aider à la compréhension, souvent à la fois en anglais et en français. 
 Important : Ne pas supprimer de classes detectées par le modèle Yolo dans le tableau de la liste des classes. Il est possible d'éventuellement les renommer. Un code a été fait pour n'afficher que les classes qui nous intéressent.
+
+Utilisation de GitHub : 
+ - pour les fichiers de plus de 100MB (weights), ajouter dans .gitignore et télécharger le fichier sur le drive.
+ - Si vous souhaitez obtenir l'accès au GitHub afin de pouvoir commit, envoyez un mail à : samy.vincent@ensta-paris.fr
 
 
 
